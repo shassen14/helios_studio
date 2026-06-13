@@ -1,0 +1,19 @@
+[project]
+name = "helios-studio"
+version = "0.1.0"
+description = "Manim component library + episode scenes for the Helios robotics video series."
+readme = "README.md"
+# Manim Community has no wheels for 3.14 yet; 3.12 is the safe sweet spot.
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "manim>=0.18.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Installs `helios_manim` (editable, via `uv sync`) so scene files under
+# scenes/ can `from helios_manim import *` no matter where manim is invoked from.
+[tool.hatch.build.targets.wheel]
+packages = ["helios_manim"]

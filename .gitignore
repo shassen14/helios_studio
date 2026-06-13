@@ -216,3 +216,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+# --- helios_studio ---
+# Large/binary media: captured sim footage, audio, thumbnails. Regenerable or
+# local-only; never committed (see HELIOS_PROJECT_CONTEXT.md).
+assets/
+
+# Manim render outputs (videos, images, Tex, partial movie files).
+media/
+
+# macOS
+.DS_Store
