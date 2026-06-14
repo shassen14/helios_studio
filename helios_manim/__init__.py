@@ -9,13 +9,16 @@ primitives instead of redrawing boxes and arrows. Build out the library before
 episode 2; episode 1 is its first customer.
 """
 
+from .camera import focus, reset
 from .node import Node
 from .packet import Packet
 from .pipeline import Pipeline
 from .port import TypedArrow, TypedPort, reject_animation
+from .style import STYLE, Style
 from .types import (
     TYPE_REGISTRY,
     type_color,
+    type_glyph,
     type_shape,
     type_style,
     types_match,
@@ -28,8 +31,13 @@ __all__ = [
     "TypedArrow",
     "TypedPort",
     "reject_animation",
+    "STYLE",
+    "Style",
+    "focus",
+    "reset",
     "TYPE_REGISTRY",
     "type_color",
+    "type_glyph",
     "type_shape",
     "type_style",
     "types_match",

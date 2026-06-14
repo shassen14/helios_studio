@@ -22,10 +22,8 @@ from manim import (
     Wiggle,
 )
 
+from .style import STYLE
 from .types import type_color, type_shape, types_match
-
-# Small visual constants, tuned once.
-_PORT_SIZE = 0.16
 
 
 def _port_mobject(shape: str, color):
@@ -41,9 +39,9 @@ def _port_mobject(shape: str, color):
         m = Square().rotate(PI / 4)
     else:  # "square" and unknown fallback
         m = Square()
-    m.set_width(_PORT_SIZE)
+    m.set_width(STYLE.port_size)
     m.set_fill(color, opacity=1.0)
-    m.set_stroke(color, width=1.5)
+    m.set_stroke(color, width=STYLE.port_stroke)
     return m
 
 
@@ -65,9 +63,9 @@ class TypedPort(RegularPolygon):
         super().__init__(n=n, start_angle=PI / 2 if shape == "pentagon" else 0)
         if shape == "diamond":
             self.rotate(PI / 4)
-        self.set_width(_PORT_SIZE)
+        self.set_width(STYLE.port_size)
         self.set_fill(color, opacity=1.0)
-        self.set_stroke(color, width=1.5)
+        self.set_stroke(color, width=STYLE.port_stroke)
 
 
 class TypedArrow(Arrow):
@@ -83,9 +81,9 @@ class TypedArrow(Arrow):
             start=start,
             end=end,
             color=type_color(type_name),
-            buff=0.1,
-            stroke_width=4,
-            tip_length=0.18,
+            buff=STYLE.arrow_buff,
+            stroke_width=STYLE.arrow_stroke,
+            tip_length=STYLE.arrow_tip_length,
             **kwargs,
         )
 
@@ -111,6 +109,10 @@ def reject_animation(src_port: TypedPort, dst_port: TypedPort):
     wire — the whole point is that the connection is refused.
     """
     return Succession(
-        Wiggle(dst_port, scale_value=1.4, rotation_angle=0.06 * PI),
-        Indicate(dst_port, color="#ff4d4d", scale_factor=1.3),
+        Wiggle(
+            dst_port,
+            scale_value=STYLE.reject_wiggle_scale,
+            rotation_angle=STYLE.reject_wiggle_angle * PI,
+        ),
+        Indicate(dst_port, color=STYLE.reject_color, scale_factor=STYLE.reject_indicate_scale),
     )
