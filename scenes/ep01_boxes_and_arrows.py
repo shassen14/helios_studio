@@ -174,11 +174,15 @@ class RewirePayoff(MovingCameraScene):
 
         # B7: rewire live — "pull the planner". Remove the planner (and its
         # wires) and route the estimator straight to the controller (a reflexive
-        # robot). Existing mobjects move in place, so the relayout animates.
+        # robot). Reconnect *before* relaying out: if we relayout with the planner
+        # gone but no new wire yet, the controller has no input, ranks as a
+        # layer-0 source, and jumps up beside the sensor (a stray triangle) before
+        # snapping back. Reconnecting first keeps the chain linear the whole time,
+        # so the new wire just draws in and the gap closes vertically.
         planner, dropped = pipe.remove_node("planner")
-        self.play(FadeOut(planner), *(FadeOut(w) for w in dropped), pipe.animate.relayout())
         new_wire = pipe.connect("estimator", "control", "Belief")
-        self.play(Create(new_wire), pipe.animate.relayout())
+        self.play(FadeOut(planner), *(FadeOut(w) for w in dropped), Create(new_wire))
+        self.play(pipe.animate.relayout())
         # TODO(B6): re-label from the abstract ChainThem boxes; cut to the live
         # DAG overlaid on the cold-open sim footage (open decision: overlay is an
         # engine feature or a post effect).

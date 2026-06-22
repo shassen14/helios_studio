@@ -2,22 +2,30 @@
 
 SERIES_PLAN.md is explicit: "Centralize the type->color map here so it's
 consistent forever." Every `TypedPort` / `TypedArrow` in every episode pulls its
-colour *and shape* from this module, so a `Pose` looks like a `Pose` in episode 1
-and still does in the SLAM episode.
+colour from this module, so a `Pose` looks like a `Pose` in episode 1 and still
+does in the SLAM episode.
 
-The *shape* is what makes the episode-1 "connectors that physically won't mate"
-beat (B4) work: mismatched types are different silhouettes, not just different
-colours (also friendlier to colour-blind viewers).
+**Colour is the single compatibility signal.** The episode-1 "wrong things won't
+connect" beat (B4) is config-time: a wire only forms when an output and an input
+*share a type*, i.e. share a colour. "Blue plugs into blue" reads instantly;
+mismatched colours refuse to wire (see :func:`~helios_manim.port.reject_animation`).
+We deliberately dropped the earlier per-type *port silhouette* — geometric shapes
+carry an orientation that fought the top-down layout, and a viewer has to be
+*taught* that a triangle means `Pose`, whereas colour-matching is self-evident.
 
-A type carries *three* visual concerns, all centralised here:
+A type carries *two* visual concerns, both centralised here:
 
-* **colour** — which wires/ports are "the blue ones" (type identity at a glance).
-* **shape** — the *port* silhouette; different shapes physically won't mate (B4).
+* **colour** — type identity at a glance, and the only thing that decides whether
+  two ports can wire together.
 * **glyph** — what a *datum of that type looks like riding a wire* (B5/B3): a
   ``Number`` shows its value in a disc, a ``Pose`` shows a little coordinate
   frame. Colour keys the type; the glyph shows what the data *is*. Types without
   a glyph fall back to :class:`~helios_manim.packet.Packet`'s plain dot, so this
   can be filled in one type at a time.
+
+Accessibility note: with shape gone, colour carries compatibility alone — keep the
+palette separated in *luminance*, not just hue, so the reject beat (motion + an X,
+not a red/green colour change) stays readable for colour-blind viewers.
 """
 
 from __future__ import annotations
@@ -42,9 +50,6 @@ from manim import (
 )
 
 from .style import STYLE
-
-# Port silhouettes used to key data types apart. Consumed by helios_manim.port.
-PORT_SHAPES = ("triangle", "square", "semicircle", "pentagon", "diamond")
 
 
 # --- packet glyphs --------------------------------------------------------
@@ -80,42 +85,29 @@ def _glyph_pose(value, color):
 #
 # Add a type here exactly once; never hard-code a colour in a scene.
 TYPE_REGISTRY: dict[str, dict] = {
-    # name            colour      port silhouette         packet glyph (optional)
-    "Number": {
-        "color": GREY_B,
-        "shape": "square",
-        "glyph": _glyph_number,
-    },  # the ep1 doubler toy type
-    "Pose": {
-        "color": BLUE_B,
-        "shape": "triangle",
-        "glyph": _glyph_pose,
-    },  # where the robot thinks it is
-    "LaserScan": {"color": ORANGE, "shape": "semicircle"},  # raw range sensor
-    "OccupancyGrid": {"color": TEAL_B, "shape": "square"},  # the map
-    "Path": {"color": GREEN_B, "shape": "pentagon"},  # planner output
-    "Twist": {"color": YELLOW_B, "shape": "diamond"},  # velocity command (controller)
-    "Belief": {"color": PURPLE_B, "shape": "triangle"},  # estimate + uncertainty
-    "Detection": {"color": RED_B, "shape": "diamond"},  # perception output
+    # name            colour      packet glyph (optional)
+    "Number": {"color": GREY_B, "glyph": _glyph_number},  # the ep1 doubler toy type
+    "Pose": {"color": BLUE_B, "glyph": _glyph_pose},  # where the robot thinks it is
+    "LaserScan": {"color": ORANGE},  # raw range sensor
+    "OccupancyGrid": {"color": TEAL_B},  # the map
+    "Path": {"color": GREEN_B},  # planner output
+    "Twist": {"color": YELLOW_B},  # velocity command (controller)
+    "Belief": {"color": PURPLE_B},  # estimate + uncertainty
+    "Detection": {"color": RED_B},  # perception output
 }
 
 # Fallback for a type not yet in the registry, so a scene never crashes mid-draft.
-_UNKNOWN = {"color": GREY_B, "shape": "square"}
+_UNKNOWN = {"color": GREY_B}
 
 
 def type_style(name: str) -> dict:
-    """Return ``{"color", "shape"}`` for a type name (case-insensitive-ish)."""
+    """Return the registry entry (``{"color", "glyph"?}``) for a type name."""
     return TYPE_REGISTRY.get(name, _UNKNOWN)
 
 
 def type_color(name: str):
     """Convenience: just the colour for a type name."""
     return type_style(name)["color"]
-
-
-def type_shape(name: str) -> str:
-    """Convenience: just the port silhouette key for a type name."""
-    return type_style(name)["shape"]
 
 
 def type_glyph(name: str):
@@ -130,7 +122,7 @@ def type_glyph(name: str):
 def types_match(a: str, b: str) -> bool:
     """Whether two ports can connect. Today: exact name match.
 
-    Centralised so the "won't mate" rule lives in one place — later this can grow
-    into subtype/compatibility rules without touching any scene.
+    Centralised so the "won't connect" rule lives in one place — later this can
+    grow into subtype/compatibility rules without touching any scene.
     """
     return a == b

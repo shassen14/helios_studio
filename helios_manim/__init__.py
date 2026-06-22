@@ -19,7 +19,6 @@ from .types import (
     TYPE_REGISTRY,
     type_color,
     type_glyph,
-    type_shape,
     type_style,
     types_match,
 )
@@ -38,7 +37,6 @@ __all__ = [
     "TYPE_REGISTRY",
     "type_color",
     "type_glyph",
-    "type_shape",
     "type_style",
     "types_match",
 ]

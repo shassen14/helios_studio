@@ -50,6 +50,7 @@ class Style:
     pip_unlit_opacity: float = 0.15
 
     # --- Ports (typed connection points) ----------------------------------
+    # A uniform disc whose colour is the type; ``port_size`` is its diameter.
     port_size: float = 0.16
     port_stroke: float = 1.5
     # Margin kept clear of the box corners when distributing multiple ports
@@ -83,11 +84,15 @@ class Style:
     # Producer/consumer spacing for the TypedArrows mismatch beat.
     mismatch_gap: float = 3.0
 
-    # --- Reject animation (the "won't mate" beat) -------------------------
+    # --- Reject animation (the "won't connect" beat) ----------------------
     reject_color: str = "#ff4d4d"
     reject_wiggle_scale: float = 1.4
     reject_wiggle_angle: float = 0.06  # multiplied by PI at the use site
     reject_indicate_scale: float = 1.3
+    # The red X blinked over a refused connection.
+    reject_x_size: float = 0.34
+    reject_x_stroke: float = 4.0
+    reject_x_fade: float = 0.25
 
 
 # The library-wide singleton. Import and read fields off this everywhere.
